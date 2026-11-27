@@ -59,19 +59,20 @@
 }
 
 /* Reglas extra (solo estilo) */
-/* Pantalla de cada día: textos más livianos y bien repartidos */
-article .rg-lead { font-size: 18px; line-height: 1.6; color: var(--texto); margin: 8px 0 24px; }
-.rg-rutina { padding: 22px 20px 20px; }
-.rg-rutina .rg-sub { margin: 2px 0 8px; font-size: 15px; line-height: 1.45; color: var(--suave); }
-.rg-rutina .lista li { padding: 11px 0; align-items: center; }
-.rg-rutina .lista li span[style*="font-weight:600"] { font-weight: 500 !important; }
-.rg-porque { margin: 30px 2px 0; padding: 2px 0 2px 16px; border-left: 3px solid var(--acento); }
-.rg-porque p { margin: 0; font-size: 16.5px; line-height: 1.65; color: var(--suave); }
-.rg-etq { display: block; margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--principal); }
-.rg-porque .rg-etq { font-size: 12px; color: var(--principal); }
-.rg-tarea, .rg-consejo { margin-top: 26px !important; padding: 16px 18px; border-radius: 18px; font-size: 16px; line-height: 1.55; color: var(--texto); }
+/* Pantalla de cada día: textos livianos, con aire y la práctica al final */
+article .rg-lead { font-size: 18px; line-height: 1.7; color: var(--texto); margin: 14px 0 0; }
+.rg-porque { margin: 40px 2px 0; padding: 4px 0 4px 18px; border-left: 3px solid var(--acento); }
+.rg-porque p { margin: 0; font-size: 16.5px; line-height: 1.75; color: var(--suave); }
+.rg-etq { display: block; margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--principal); }
+.rg-tarea, .rg-consejo { margin-top: 32px !important; padding: 20px 22px; border-radius: 20px; font-size: 16px; line-height: 1.65; color: var(--texto); }
 .rg-tarea { background: #FFFFFF; border: 1px solid var(--borde); box-shadow: var(--sombra); }
 .rg-consejo { background: #F4F8FE; border: 1px solid #E3ECF9; }
 .rg-consejo .rg-etq { color: #4A7DBF; }
-
+.rg-seccion { margin: 52px 4px 14px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--suave); }
+article .tarjeta + .tarjeta { margin-top: 20px; }
+.rg-rutina { padding: 24px 22px 22px; }
+.rg-rutina .rg-sub { margin: 4px 0 12px; font-size: 15px; line-height: 1.5; color: var(--suave); }
+.rg-rutina .lista li { padding: 14px 0; align-items: center; }
+.rg-rutina .lista li span[style*="font-weight:600"] { font-weight: 500 !important; }
+.rg-rutina [data-guiado] { margin-top: 18px !important; }
 ::selection { background: #DCE9FA; color: #2E2A3D; }

@@ -39,6 +39,7 @@
   `;
   document.head.appendChild(estilo);
 
+  const PRODUCTO_SONIDO = (window.CONFIG && CONFIG.PRODUCTO) || 'app';
   const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   const esResp = (x) => x && x.tipo === 'ejercicio' && Array.isArray(x.respiracion) && x.respiracion.length > 0;
   const pasosDe = (x) => x.respiracion.map(([t, s, e]) => ({ t, s: Math.max(1, Number(s) || 1), e: e == null ? null : Number(e) }));
@@ -65,12 +66,95 @@
     document.body.appendChild(capa);
     try { navigator.wakeLock && navigator.wakeLock.request('screen').then((w) => { wake = w; }).catch(() => {}); } catch {}
 
-    let audio = null;
-    const tono = (freq, dur, vol) => { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); const o = audio.createOscillator(), g = audio.createGain();
-      o.type = 'sine'; o.frequency.value = freq; g.gain.setValueAtTime(vol, audio.currentTime); g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + dur);
-      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + dur + .02); } catch {} };
-    const pitido = (alto) => tono(alto ? 1046 : 784, .18, .18);
-    const cerrar = () => { clearInterval(timer); capa.remove(); try { wake && wake.release(); } catch {} };
+    // Sonido: el celular (sobre todo iPhone) solo deja sonar si el audio se "despierta" con un toque de la persona.
+    let audio = null, salida = null;
+    const CLAVE_SONIDO = PRODUCTO_SONIDO + ':sonido';
+    let conSonido = (() => { try { return localStorage.getItem(CLAVE_SONIDO) !== 'off'; } catch { return true; } })();
+    const destino = () => { if (!salida) { salida = audio.createGain(); salida.gain.value = conSonido ? 1 : 0; salida.connect(audio.destination); } return salida; };
+    const despertarAudio = () => {
+      try {
+        audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+        if (audio.state === 'suspended') audio.resume();
+        const silencio = audio.createBuffer(1, 1, 22050), fuente = audio.createBufferSource();
+        fuente.buffer = silencio; fuente.connect(audio.destination); fuente.start(0);
+      } catch {}
+    };
+    const tono = (freq, dur, vol) => { try {
+      if (!audio) return;
+      if (audio.state === 'suspended') audio.resume();
+      const t = audio.currentTime, o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(destino()); o.start(t); o.stop(t + dur + 0.05);
+    } catch {} };
+    const pitido = (alto) => tono(alto ? 1046 : 784, .25, .3);
+
+    // Sonido de aire: entra al inhalar, sale al exhalar (ruido suave filtrado, dura lo mismo que cada fase).
+    let ruido = null, aireActual = null;
+    const pararAire = () => {
+      if (!aireActual || !audio) return;
+      try { const t = audio.currentTime; aireActual.g.gain.cancelScheduledValues(t); aireActual.g.gain.setTargetAtTime(0.0001, t, 0.08); aireActual.src.stop(t + 0.35); } catch {}
+      aireActual = null;
+    };
+    const aire = (tipo, dur) => { try {
+      if (!audio) return;
+      pararAire();
+      if (audio.state === 'suspended') audio.resume();
+      if (!ruido) {
+        ruido = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
+        const d = ruido.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      const t = audio.currentTime, D = Math.max(0.8, dur), vol = 1.0;
+      const src = audio.createBufferSource(); src.buffer = ruido; src.loop = true;
+      const filtro = audio.createBiquadFilter(); filtro.type = 'bandpass'; filtro.Q.value = 0.9;
+      const suave = audio.createBiquadFilter(); suave.type = 'lowpass'; suave.frequency.value = 2600;
+      const g = audio.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      if (tipo === 'entra') {
+        filtro.frequency.setValueAtTime(600, t); filtro.frequency.linearRampToValueAtTime(1500, t + D);
+        g.gain.exponentialRampToValueAtTime(vol, t + D * 0.4);
+        g.gain.setValueAtTime(vol, t + D * 0.75);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + D);
+      } else {
+        filtro.frequency.setValueAtTime(1100, t); filtro.frequency.linearRampToValueAtTime(380, t + D);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.3);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + D);
+      }
+      src.connect(filtro).connect(suave).connect(g).connect(destino());
+      src.start(t); src.stop(t + D + 0.1);
+      aireActual = { src, g };
+    } catch {} };
+
+    // Mar de fondo, muy suave: olas que suben y bajan lento (se genera aquí mismo, sin archivos de audio).
+    let mar = null;
+    const CON_MAR = false;   // mar de fondo apagado (a Val no le gustó). true = vuelve a sonar.
+    const VOL_MAR = 0.16;
+    const iniciarMar = () => { try {
+      if (!CON_MAR || !audio || mar) return;
+      const sr = audio.sampleRate, buf = audio.createBuffer(2, sr * 6, sr);
+      for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); let ultimo = 0;
+        for (let i = 0; i < d.length; i++) { const blanco = Math.random() * 2 - 1; ultimo = (ultimo + 0.02 * blanco) / 1.02; d[i] = ultimo * 3.2; } }
+      const src = audio.createBufferSource(); src.buffer = buf; src.loop = true;
+      const filtro = audio.createBiquadFilter(); filtro.type = 'lowpass'; filtro.frequency.value = 900;
+      const ola = audio.createGain(); ola.gain.value = 0.55;
+      const lfo = audio.createOscillator(); lfo.frequency.value = 0.09;            // una ola cada ~11 segundos
+      const lfoVol = audio.createGain(); lfoVol.gain.value = 0.45;
+      lfo.connect(lfoVol).connect(ola.gain);
+      const master = audio.createGain(); const t = audio.currentTime;
+      master.gain.setValueAtTime(0.0001, t); master.gain.exponentialRampToValueAtTime(VOL_MAR, t + 3);
+      src.connect(filtro).connect(ola).connect(master).connect(destino());
+      src.start(t); lfo.start(t);
+      mar = { src, lfo, master };
+    } catch {} };
+    const volumenMar = (v) => { if (!mar) return; try { const t = audio.currentTime; mar.master.gain.cancelScheduledValues(t); mar.master.gain.setTargetAtTime(Math.max(v, 0.0001), t, 0.6); } catch {} };
+    const pararMar = () => { if (!mar) return; try { const t = audio.currentTime; volumenMar(0); mar.src.stop(t + 2.5); mar.lfo.stop(t + 2.5); } catch {} mar = null; };
+    const iconoSonido = () => conSonido ? '🔊' : '🔇';
+    const botonSonido = () => `<button class="boton texto gris" data-g="sonido" aria-label="Sonido" style="font-size:20px;letter-spacing:0">${iconoSonido()}</button>`;
+
+    const cerrar = () => { clearInterval(timer); pararAire(); pararMar(); capa.remove(); try { wake && wake.release(); } catch {} };
 
     function pintar() {
       const x = fases[f];
@@ -96,7 +180,7 @@
            <h1 class="rg-paso">${esc(x.nombre)}</h1>`;
       capa.innerHTML = `
         <div class="barra"><button class="boton texto gris" data-g="cerrar">Cerrar</button>
-          <span class="suave chico" style="font-variant-numeric:tabular-nums">${x.ronda && rondas > 1 ? `Ronda ${x.ronda} de ${rondas}` : ''}</span></div>
+          <span style="display:flex;align-items:center;gap:10px"><span class="suave chico" style="font-variant-numeric:tabular-nums">${x.ronda && rondas > 1 ? `Ronda ${x.ronda} de ${rondas}` : ''}</span>${botonSonido()}</span></div>
         <div class="progreso" style="margin:6px 0 0"><i style="width:${Math.round((f / fases.length) * 100)}%"></i></div>
         <div class="centro" style="align-items:center;text-align:center">
           ${x.video ? `<video data-src="${esc(x.video)}" autoplay muted loop playsinline style="width:100%;max-width:360px;border-radius:var(--radio);margin-bottom:18px;background:#000"></video>` : ''}
@@ -147,10 +231,11 @@
         bola.style.transition = `transform ${queda}s cubic-bezier(.45,.05,.55,.95)`;
         bola.style.transform = `scale(${hacia})`;
       }
-      if (cambio && !pausa) {
-        if (hacia > desde) tono(528, .5, .07);
-        else if (hacia < desde) tono(396, .6, .07);
-        toque(12);
+      if (!pausa) {
+        if (hacia > desde) aire('entra', queda);
+        else if (hacia < desde) aire('sale', queda);
+        else pararAire();
+        if (cambio) toque(12);
       }
     }
 
@@ -165,10 +250,10 @@
       f += d;
       if (f >= fases.length) return terminar();
       if (f < 0) f = 0;
-      restante = fases[f].segundos; pitido(true); toque(30); pintar();
+      pararAire(); restante = fases[f].segundos; pitido(true); toque(30); pintar();
     }
     function terminar() {
-      clearInterval(timer); pitido(true);
+      clearInterval(timer); pararAire(); pararMar(); pitido(true);
       capa.dataset.fase = '';
       capa.innerHTML = `<div class="centro" style="align-items:center;text-align:center">
         <div style="font-size:72px;animation:caer .6s var(--resorte) both" aria-hidden="true">🌱</div>
@@ -179,19 +264,27 @@
           <button class="boton texto gris" data-g="cerrar">Cerrar</button></div>`;
     }
     capa.addEventListener('click', (e) => {
+      despertarAudio();
       const g = e.target.closest('[data-g]'); if (!g) return;
       const a = g.dataset.g;
       if (a === 'cerrar') cerrar();
-      else if (a === 'empezar') { toque(); arrancar(); }
-      else if (a === 'repetir') { toque(); f = 0; restante = fases[0].segundos; pausa = false; arrancar(); }
+      else if (a === 'empezar') { toque(); iniciarMar(); arrancar(); }
+      else if (a === 'sonido') {
+        conSonido = !conSonido; toque();
+        try { localStorage.setItem(CLAVE_SONIDO, conSonido ? 'on' : 'off'); } catch {}
+        if (salida) { const t = audio.currentTime; salida.gain.cancelScheduledValues(t); salida.gain.setTargetAtTime(conSonido ? 1 : 0, t, 0.15); }
+        capa.querySelectorAll('[data-g="sonido"]').forEach((el) => { el.textContent = iconoSonido(); });
+      }
+      else if (a === 'repetir') { toque(); f = 0; restante = fases[0].segundos; pausa = false; iniciarMar(); arrancar(); }
       else if (a === 'hecho') { cerrar(); op.alTerminar && op.alTerminar(); }
       else if (a === 'pausa') {
         pausa = !pausa; toque(); g.textContent = pausa ? '▶︎ Seguir' : '❚❚ Pausa';
         const v = capa.querySelector('video'); if (v) pausa ? v.pause() : v.play().catch(() => {});
         const bola = capa.querySelector('[data-bola]');
+        if (!bola) volumenMar(pausa ? 0 : VOL_MAR);
         if (bola) {
-          if (pausa) { const m = getComputedStyle(bola).transform; bola.style.transition = 'none'; bola.style.transform = m; }
-          else respirar(true);
+          if (pausa) { pararAire(); volumenMar(0); const m = getComputedStyle(bola).transform; bola.style.transition = 'none'; bola.style.transform = m; }
+          else { volumenMar(VOL_MAR); respirar(true); }
         }
       }
       else if (a === 'saltar') avanzar(1);
@@ -216,7 +309,7 @@
       const textoIntro = b.intro || (window.APP && APP.introRutina) || '';
       capa.dataset.fase = '';
       capa.innerHTML = `
-        <div class="barra"><button class="boton texto gris" data-g="cerrar">Cerrar</button><span></span></div>
+        <div class="barra"><button class="boton texto gris" data-g="cerrar">Cerrar</button>${botonSonido()}</div>
         <div class="centro" style="align-items:center;text-align:center">
           <div class="rg-resp" style="--tam:${Math.min(150, innerWidth - 200)}px;margin-bottom:18px"><span class="rg-bola rg-quieta"></span></div>
           <p class="micro" style="color:var(--principal);margin:0 0 6px">${esc(b.titulo || 'Tu práctica')} · ${Math.max(1, Math.round(total / 60))} min</p>
@@ -306,6 +399,22 @@
         av.append(etiqueta('🌱 Tu tarea de hoy'), p);
       }
     });
+    // Orden: intro → por qué → consejo → tarea → la práctica al final (con el botón Empezar).
+    const cont = art.querySelector('.rg-lead') ? art.querySelector('.rg-lead').parentElement : art.lastElementChild;
+    if (cont) {
+      cont.querySelectorAll(':scope > .rg-porque, :scope > .rg-consejo, :scope > .rg-tarea').forEach((n) => cont.appendChild(n));
+      const tarjetas = cont.querySelectorAll(':scope > .tarjeta');
+      if (tarjetas.length) {
+        const titulo = document.createElement('p'); titulo.className = 'rg-seccion'; titulo.textContent = 'Tu práctica de hoy';
+        cont.appendChild(titulo);
+        tarjetas.forEach((n) => cont.appendChild(n));
+      }
+    }
+    // Sin botón fijo abajo: el día se marca como hecho al terminar la práctica guiada.
+    const fijo = document.querySelector('#app [data-hecho]');
+    if (fijo && fijo.closest('.tabs')) fijo.closest('.tabs').style.display = 'none';
+    const pantalla = art.closest('.pantalla');
+    if (pantalla) pantalla.style.paddingBottom = 'calc(56px + env(safe-area-inset-bottom))';
   }
 
   const iniciar = () => {
