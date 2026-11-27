@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sembrar Calma</title>
+<meta name="description" content="21 días para educar tu respiración: 5 minutos al día que sí vas a sostener.">
+<!-- Se ve como app al agregarla a la pantalla de inicio -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F7F4FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F7F4FA" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sembrar Calma">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="diseno.css"><!-- tu diseño: colores, letra, tema, formas -->
+</head>
+<body>
+  <main id="app" aria-live="polite"></main>
+  <noscript>Activa JavaScript para usar esta app.</noscript>
+
+  <!-- No cambies el orden de estos archivos -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="cobro.js"></script>
+  <script src="ui.js"></script>
+  <script src="respiracion.js"></script><!-- el círculo que respira -->
+  <script src="contenido.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

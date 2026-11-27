@@ -1,0 +1,16 @@
+{
+  "name": "Sembrar Calma",
+  "short_name": "Sembrar Calma",
+  "description": "21 días para educar tu respiración: 5 minutos al día que sí vas a sostener.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F4FA",
+  "theme_color": "#C4466B",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

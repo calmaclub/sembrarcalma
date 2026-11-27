@@ -1,0 +1,77 @@
+/* Reto Sembrar Calma · diseño "Amanecer pastel" */
+/* Tipografía (Google Fonts): Outfit para títulos, Nunito para leer */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap');
+
+:root {
+  --principal: #C4466B;          /* rosa empolvado: botones, enlaces, progreso */
+  --principal-texto: #FFFFFF;    /* texto encima del rosa */
+  --acento: #8FB8EA;             /* azul cielo, para resaltar poco */
+  --radio: 26px;                 /* esquinas muy redondas */
+  --radio-boton: 999px;          /* botones de píldora */
+  --fuente: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  --fuente-titulos: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+  --peso-titulos: 500;
+  --peso-subtitulos: 600;
+  --tracking-titulos: -0.01em;
+  --mayus-titulos: none;
+  --peso-boton: 600;
+  --mayus-boton: uppercase;
+  --tracking-boton: 0.12em;
+  --tamano-texto: 17px;
+  --interlineado: 1.6;
+  --fondo: #FFFFFF;              /* blanco: pantallas livianas */
+  --tarjeta: #FFFFFF;
+  --tarjeta-2: #F2E8F1;          /* rosa niebla */
+  --texto: #2E2A3D;              /* ciruela profundo */
+  --suave: #6E6880;              /* textos secundarios */
+  --terciario: rgba(46, 42, 61, .30);
+  --borde: #ECE4F0;
+  --relleno: rgba(143, 184, 234, .16);
+  --sombra: 0 8px 28px rgba(120, 110, 160, .10);
+  --sombra-alta: 0 16px 48px rgba(120, 110, 160, .20);
+  --vidrio: rgba(255, 255, 255, .88);
+  --linea-tarjeta: 1px solid #F1ECF4;     /* borde casi invisible + sombra suave */
+  --fondo-imagen: linear-gradient(180deg, rgba(178, 208, 245, .38) 0px, rgba(255, 255, 255, 0) 240px); /* solo un toque de cielo arriba */
+  color-scheme: light;
+}
+
+/* Tema SIEMPRE CLARO: se repite la paleta para cuando el teléfono está en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --principal: #C4466B;
+    --principal-texto: #FFFFFF;
+    --acento: #8FB8EA;
+    --fondo: #FFFFFF;
+    --tarjeta: #FFFFFF;
+    --tarjeta-2: #F2E8F1;
+    --texto: #2E2A3D;
+    --suave: #6E6880;
+    --terciario: rgba(46, 42, 61, .30);
+    --borde: #ECE4F0;
+    --relleno: rgba(143, 184, 234, .16);
+    --sombra: 0 8px 28px rgba(120, 110, 160, .10);
+    --sombra-alta: 0 16px 48px rgba(120, 110, 160, .20);
+    --vidrio: rgba(255, 255, 255, .88);
+    --linea-tarjeta: 1px solid #F1ECF4;
+    --fondo-imagen: linear-gradient(180deg, rgba(178, 208, 245, .38) 0px, rgba(255, 255, 255, 0) 240px);
+    color-scheme: light;
+  }
+}
+
+/* Reglas extra (solo estilo) */
+/* Pantalla de cada día: textos más livianos y bien repartidos */
+article .rg-lead { font-size: 18px; line-height: 1.6; color: var(--texto); margin: 8px 0 24px; }
+.rg-rutina { padding: 22px 20px 20px; }
+.rg-rutina .rg-sub { margin: 2px 0 8px; font-size: 15px; line-height: 1.45; color: var(--suave); }
+.rg-rutina .lista li { padding: 11px 0; align-items: center; }
+.rg-rutina .lista li span[style*="font-weight:600"] { font-weight: 500 !important; }
+.rg-porque { margin: 30px 2px 0; padding: 2px 0 2px 16px; border-left: 3px solid var(--acento); }
+.rg-porque p { margin: 0; font-size: 16.5px; line-height: 1.65; color: var(--suave); }
+.rg-etq { display: block; margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--principal); }
+.rg-porque .rg-etq { font-size: 12px; color: var(--principal); }
+.rg-tarea, .rg-consejo { margin-top: 26px !important; padding: 16px 18px; border-radius: 18px; font-size: 16px; line-height: 1.55; color: var(--texto); }
+.rg-tarea { background: #FFFFFF; border: 1px solid var(--borde); box-shadow: var(--sombra); }
+.rg-consejo { background: #F4F8FE; border: 1px solid #E3ECF9; }
+.rg-consejo .rg-etq { color: #4A7DBF; }
+
+::selection { background: #DCE9FA; color: #2E2A3D; }

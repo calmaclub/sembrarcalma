@@ -1,0 +1,69 @@
+/* diseno.css · EL DISEÑO DE TU PRODUCTO. Este archivo es tuyo: cámbialo entero si quieres.
+   Look de partida: Vibrante. Fondo con degradado de color, botones redondos, títulos gruesos. Energía y juventud.
+   Otros looks para empezar: carpeta looks/ (copia uno aquí encima y ajústalo).
+
+   Qué se puede cambiar aquí: colores, tema (claro, oscuro o automático), tipografía, fondo,
+   esquinas, sombras, bordes, peso y mayúsculas de títulos y botones, y reglas extra al final.
+   Lo que NO se toca: app.js, ui.js, cobro.js, config.js, estilo.css (ahí viven las cuentas, el cobro y la app). */
+
+/* Tipografía (Google Fonts). Para usar otra: fonts.google.com → elige → cambia el nombre aquí y en --fuente / --fuente-titulos.
+   Sin internet se usa la letra del teléfono. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+/* Tema: SIEMPRE CLARO (no cambia aunque el teléfono esté en modo oscuro). */
+:root {
+  --principal: #6c2bff;
+  --principal-texto: #ffffff;
+  --acento: #ff4fa3;
+  --radio: 26px;
+  --radio-boton: 999px;
+  --fuente: 'Poppins', system-ui, sans-serif;
+  --fuente-titulos: 'Poppins', system-ui, sans-serif;
+  --peso-titulos: 800;
+  --tracking-titulos: -0.03em;
+  --mayus-titulos: none;
+  --peso-boton: 600;
+  --mayus-boton: none;
+  --fondo: #f4efff;
+  --tarjeta: rgba(255, 255, 255, .86);
+  --tarjeta-2: #ffffff;
+  --texto: #1b1035;
+  --suave: #5d527a;
+  --borde: rgba(108, 43, 255, .14);
+  --terciario: rgba(27, 16, 53, .3);
+  --relleno: rgba(108, 43, 255, .08);
+  --sombra: 0 10px 30px rgba(108, 43, 255, .12);
+  --sombra-alta: 0 10px 40px rgba(27, 16, 53, .18);
+  --vidrio: rgba(244, 239, 255, .8);
+  --linea-tarjeta: 0 solid transparent;
+  --fondo-imagen: radial-gradient(60% 40% at 0% 0%, rgba(255, 79, 163, .22), transparent 70%), radial-gradient(60% 45% at 100% 10%, rgba(108, 43, 255, .2), transparent 70%);
+  color-scheme: light;
+}
+/* La misma paleta cuando el teléfono está en modo oscuro (así el tema no cambia) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --principal: #6c2bff;
+    --principal-texto: #ffffff;
+    --acento: #ff4fa3;
+    --radio: 26px;
+    --radio-boton: 999px;
+    --fondo: #f4efff;
+    --tarjeta: rgba(255, 255, 255, .86);
+    --tarjeta-2: #ffffff;
+    --texto: #1b1035;
+    --suave: #5d527a;
+    --borde: rgba(108, 43, 255, .14);
+    --terciario: rgba(27, 16, 53, .3);
+    --relleno: rgba(108, 43, 255, .08);
+    --sombra: 0 10px 30px rgba(108, 43, 255, .12);
+    --sombra-alta: 0 10px 40px rgba(27, 16, 53, .18);
+    --vidrio: rgba(244, 239, 255, .8);
+    --linea-tarjeta: 0 solid transparent;
+    --fondo-imagen: radial-gradient(60% 40% at 0% 0%, rgba(255, 79, 163, .22), transparent 70%), radial-gradient(60% 45% at 100% 10%, rgba(108, 43, 255, .2), transparent 70%);
+    color-scheme: light;
+  }
+}
+
+/* ── Reglas extra (opcional) ──
+   Aquí puedes agregar detalles de diseño: un borde de color en los títulos, otra forma para las tarjetas, etc.
+   Solo estilo: nunca ocultes botones, formularios ni el candado del contenido de pago. */

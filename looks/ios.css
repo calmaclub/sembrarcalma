@@ -1,0 +1,51 @@
+/* diseno.css · EL DISEÑO DE TU PRODUCTO. Este archivo es tuyo: cámbialo entero si quieres.
+   Look de partida: iOS limpio. Como una app de Apple: fondo gris claro, tarjetas blancas, letra del sistema.
+   Otros looks para empezar: carpeta looks/ (copia uno aquí encima y ajústalo).
+
+   Qué se puede cambiar aquí: colores, tema (claro, oscuro o automático), tipografía, fondo,
+   esquinas, sombras, bordes, peso y mayúsculas de títulos y botones, y reglas extra al final.
+   Lo que NO se toca: app.js, ui.js, cobro.js, config.js, estilo.css (ahí viven las cuentas, el cobro y la app). */
+
+/* Tipografía: la del teléfono (no necesita internet). Para usar una de Google Fonts, mira el look minimal o editorial. */
+
+/* Tema: AUTOMÁTICO (claro de día; oscuro si el teléfono está en modo oscuro).
+   Para dejarlo siempre claro: borra el bloque @media de abajo y pon `color-scheme: light` en :root. */
+:root {
+  --principal: #ff375f;
+  --principal-texto: #ffffff;
+  --acento: #ff9f0a;
+  --radio: 20px;
+  --radio-boton: 14px;
+  --fuente: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --fuente-titulos: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --peso-titulos: 800;
+  --tracking-titulos: -0.035em;
+  --mayus-titulos: none;
+  --peso-boton: 600;
+  --mayus-boton: none;
+  --fondo: #f2f2f7;
+  --tarjeta: #ffffff;
+  --tarjeta-2: #f7f7fa;
+  --texto: #000000;
+  --suave: rgba(60, 60, 67, .62);
+  --borde: rgba(60, 60, 67, .14);
+  --sombra: 0 1px 1px rgba(0,0,0,.02), 0 6px 20px rgba(0,0,0,.06);
+  --linea-tarjeta: 0 solid transparent;
+  --fondo-imagen: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --fondo: #000000;
+    --tarjeta: #1c1c1e;
+    --tarjeta-2: #2c2c2e;
+    --texto: #ffffff;
+    --suave: rgba(235, 235, 245, .62);
+    --borde: rgba(84, 84, 88, .55);
+    --sombra: none;
+    color-scheme: dark;
+  }
+}
+
+/* ── Reglas extra (opcional) ──
+   Aquí puedes agregar detalles de diseño: un borde de color en los títulos, otra forma para las tarjetas, etc.
+   Solo estilo: nunca ocultes botones, formularios ni el candado del contenido de pago. */

@@ -1,0 +1,55 @@
+/* diseno.css · EL DISEÑO DE TU PRODUCTO. Este archivo es tuyo: cámbialo entero si quieres.
+   Look de partida: Minimal. Blanco y negro, bordes finos, sin sombras. Serio y ordenado.
+   Otros looks para empezar: carpeta looks/ (copia uno aquí encima y ajústalo).
+
+   Qué se puede cambiar aquí: colores, tema (claro, oscuro o automático), tipografía, fondo,
+   esquinas, sombras, bordes, peso y mayúsculas de títulos y botones, y reglas extra al final.
+   Lo que NO se toca: app.js, ui.js, cobro.js, config.js, estilo.css (ahí viven las cuentas, el cobro y la app). */
+
+/* Tipografía (Google Fonts). Para usar otra: fonts.google.com → elige → cambia el nombre aquí y en --fuente / --fuente-titulos.
+   Sin internet se usa la letra del teléfono. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Tema: AUTOMÁTICO (claro de día; oscuro si el teléfono está en modo oscuro).
+   Para dejarlo siempre claro: borra el bloque @media de abajo y pon `color-scheme: light` en :root. */
+:root {
+  --principal: #111111;
+  --principal-texto: #ffffff;
+  --acento: #2f6bff;
+  --radio: 10px;
+  --radio-boton: 8px;
+  --fuente: 'Inter', system-ui, sans-serif;
+  --fuente-titulos: 'Inter', system-ui, sans-serif;
+  --peso-titulos: 700;
+  --tracking-titulos: -0.04em;
+  --mayus-titulos: none;
+  --peso-boton: 600;
+  --mayus-boton: none;
+  --fondo: #ffffff;
+  --tarjeta: #ffffff;
+  --tarjeta-2: #f6f6f6;
+  --texto: #111111;
+  --suave: #6b6b6b;
+  --borde: #e6e6e6;
+  --sombra: none;
+  --linea-tarjeta: 1px solid var(--borde);
+  --fondo-imagen: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --principal: #ffffff;
+    --principal-texto: #111111;
+    --fondo: #0b0b0b;
+    --tarjeta: #111111;
+    --tarjeta-2: #1a1a1a;
+    --texto: #f2f2f2;
+    --suave: #9a9a9a;
+    --borde: #262626;
+    --sombra: none;
+    color-scheme: dark;
+  }
+}
+
+/* ── Reglas extra (opcional) ──
+   Aquí puedes agregar detalles de diseño: un borde de color en los títulos, otra forma para las tarjetas, etc.
+   Solo estilo: nunca ocultes botones, formularios ni el candado del contenido de pago. */

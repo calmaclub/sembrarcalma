@@ -1,0 +1,73 @@
+/* diseno.css · EL DISEÑO DE TU PRODUCTO. Este archivo es tuyo: cámbialo entero si quieres.
+   Look de partida: Editorial. Como una revista: títulos con serifa, papel crema, esquinas pequeñas.
+   Otros looks para empezar: carpeta looks/ (copia uno aquí encima y ajústalo).
+
+   Qué se puede cambiar aquí: colores, tema (claro, oscuro o automático), tipografía, fondo,
+   esquinas, sombras, bordes, peso y mayúsculas de títulos y botones, y reglas extra al final.
+   Lo que NO se toca: app.js, ui.js, cobro.js, config.js, estilo.css (ahí viven las cuentas, el cobro y la app). */
+
+/* Tipografía (Google Fonts). Para usar otra: fonts.google.com → elige → cambia el nombre aquí y en --fuente / --fuente-titulos.
+   Sin internet se usa la letra del teléfono. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600&display=swap');
+
+/* Tema: SIEMPRE CLARO (no cambia aunque el teléfono esté en modo oscuro). */
+:root {
+  --principal: #9b3d25;
+  --principal-texto: #fffaf3;
+  --acento: #c99a3b;
+  --radio: 6px;
+  --radio-boton: 4px;
+  --fuente: 'Source Sans 3', Georgia, sans-serif;
+  --fuente-titulos: 'Fraunces', Georgia, serif;
+  --peso-titulos: 600;
+  --peso-subtitulos: 600;
+  --tracking-titulos: -0.02em;
+  --mayus-titulos: none;
+  --peso-boton: 600;
+  --mayus-boton: uppercase;
+  --tracking-boton: 0.08em;
+  --tamano-texto: 18px;
+  --interlineado: 1.55;
+  --fondo: #f6f0e6;
+  --tarjeta: #fffaf2;
+  --tarjeta-2: #f1e8da;
+  --texto: #2a211b;
+  --suave: #6e6156;
+  --borde: #e3d6c3;
+  --terciario: rgba(42, 33, 27, .32);
+  --relleno: rgba(110, 97, 86, .12);
+  --sombra: none;
+  --sombra-alta: 0 10px 40px rgba(0,0,0,.14);
+  --vidrio: rgba(246, 240, 230, .82);
+  --linea-tarjeta: 1px solid var(--borde);
+  --fondo-imagen: none;
+  color-scheme: light;
+}
+/* La misma paleta cuando el teléfono está en modo oscuro (así el tema no cambia) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --principal: #9b3d25;
+    --principal-texto: #fffaf3;
+    --acento: #c99a3b;
+    --radio: 6px;
+    --radio-boton: 4px;
+    --fondo: #f6f0e6;
+    --tarjeta: #fffaf2;
+    --tarjeta-2: #f1e8da;
+    --texto: #2a211b;
+    --suave: #6e6156;
+    --borde: #e3d6c3;
+    --terciario: rgba(42, 33, 27, .32);
+    --relleno: rgba(110, 97, 86, .12);
+    --sombra: none;
+    --sombra-alta: 0 10px 40px rgba(0,0,0,.14);
+    --vidrio: rgba(246, 240, 230, .82);
+    --linea-tarjeta: 1px solid var(--borde);
+    --fondo-imagen: none;
+    color-scheme: light;
+  }
+}
+
+/* ── Reglas extra (opcional) ──
+   Aquí puedes agregar detalles de diseño: un borde de color en los títulos, otra forma para las tarjetas, etc.
+   Solo estilo: nunca ocultes botones, formularios ni el candado del contenido de pago. */

@@ -1,0 +1,55 @@
+/* diseno.css · EL DISEÑO DE TU PRODUCTO. Este archivo es tuyo: cámbialo entero si quieres.
+   Look de partida: Natural. Tonos tierra y verde, letra redonda, esquinas grandes. Cálido y cercano.
+   Otros looks para empezar: carpeta looks/ (copia uno aquí encima y ajústalo).
+
+   Qué se puede cambiar aquí: colores, tema (claro, oscuro o automático), tipografía, fondo,
+   esquinas, sombras, bordes, peso y mayúsculas de títulos y botones, y reglas extra al final.
+   Lo que NO se toca: app.js, ui.js, cobro.js, config.js, estilo.css (ahí viven las cuentas, el cobro y la app). */
+
+/* Tipografía (Google Fonts). Para usar otra: fonts.google.com → elige → cambia el nombre aquí y en --fuente / --fuente-titulos.
+   Sin internet se usa la letra del teléfono. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
+
+/* Tema: AUTOMÁTICO (claro de día; oscuro si el teléfono está en modo oscuro).
+   Para dejarlo siempre claro: borra el bloque @media de abajo y pon `color-scheme: light` en :root. */
+:root {
+  --principal: #3f7d5a;
+  --principal-texto: #ffffff;
+  --acento: #e2a04a;
+  --radio: 24px;
+  --radio-boton: 16px;
+  --fuente: 'Nunito', system-ui, sans-serif;
+  --fuente-titulos: 'Nunito', system-ui, sans-serif;
+  --peso-titulos: 800;
+  --tracking-titulos: -0.02em;
+  --mayus-titulos: none;
+  --peso-boton: 700;
+  --mayus-boton: none;
+  --fondo: #f3efe6;
+  --tarjeta: #fffdf8;
+  --tarjeta-2: #f6f1e7;
+  --texto: #26302a;
+  --suave: #66706a;
+  --borde: #e4dccd;
+  --sombra: 0 2px 10px rgba(60, 50, 30, .07);
+  --linea-tarjeta: 0 solid transparent;
+  --fondo-imagen: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --principal: #7cc49a;
+    --principal-texto: #10231a;
+    --fondo: #141a16;
+    --tarjeta: #1d2520;
+    --tarjeta-2: #26302a;
+    --texto: #eef2ec;
+    --suave: rgba(238, 242, 236, .62);
+    --borde: rgba(238, 242, 236, .12);
+    --sombra: none;
+    color-scheme: dark;
+  }
+}
+
+/* ── Reglas extra (opcional) ──
+   Aquí puedes agregar detalles de diseño: un borde de color en los títulos, otra forma para las tarjetas, etc.
+   Solo estilo: nunca ocultes botones, formularios ni el candado del contenido de pago. */
