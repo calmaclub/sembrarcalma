@@ -105,24 +105,25 @@
       if (!ruido) {
         ruido = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
         const d = ruido.getChannelData(0);
-        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        let b0 = 0, b1 = 0, b2 = 0;   // ruido rosado: más cálido y suave que el blanco
+        for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1;
+          b0 = 0.99765 * b0 + w * 0.0990460; b1 = 0.96300 * b1 + w * 0.2965164; b2 = 0.57000 * b2 + w * 1.0526913;
+          d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.18; }
       }
-      const t = audio.currentTime, D = Math.max(0.8, dur), vol = 1.0;
+      // Un suspiro corto y muy suave al empezar cada fase (no suena toda la fase): aire liviano, sin graves.
+      const t = audio.currentTime, vol = 0.07;   // volumen del suspiro (más bajo = más suave)
+      const D = tipo === 'entra' ? Math.min(2.2, Math.max(0.9, dur * 0.6)) : Math.min(2.8, Math.max(1.1, dur * 0.5));
       const src = audio.createBufferSource(); src.buffer = ruido; src.loop = true;
-      const filtro = audio.createBiquadFilter(); filtro.type = 'bandpass'; filtro.Q.value = 0.9;
-      const suave = audio.createBiquadFilter(); suave.type = 'lowpass'; suave.frequency.value = 2600;
+      const filtro = audio.createBiquadFilter(); filtro.type = 'bandpass'; filtro.Q.value = 1.1;
+      const suave = audio.createBiquadFilter(); suave.type = 'highpass'; suave.frequency.value = 500;
       const g = audio.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      if (tipo === 'entra') {
-        filtro.frequency.setValueAtTime(600, t); filtro.frequency.linearRampToValueAtTime(1500, t + D);
-        g.gain.exponentialRampToValueAtTime(vol, t + D * 0.4);
-        g.gain.setValueAtTime(vol, t + D * 0.75);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + D);
-      } else {
-        filtro.frequency.setValueAtTime(1100, t); filtro.frequency.linearRampToValueAtTime(380, t + D);
-        g.gain.exponentialRampToValueAtTime(vol, t + 0.3);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + D);
-      }
+      // curva suave (sube y baja como una campana) para que no tenga golpe
+      const curva = new Float32Array(64);
+      for (let i = 0; i < curva.length; i++) { const x = i / (curva.length - 1); curva[i] = vol * Math.pow(Math.sin(Math.PI * Math.pow(x, tipo === 'entra' ? 0.8 : 0.6)), 2) + 0.00001; }
+      g.gain.setValueAtTime(0.00001, t);
+      g.gain.setValueCurveAtTime(curva, t + 0.01, D);
+      if (tipo === 'entra') { filtro.frequency.setValueAtTime(1100, t); filtro.frequency.linearRampToValueAtTime(1900, t + D); }
+      else { filtro.frequency.setValueAtTime(1700, t); filtro.frequency.linearRampToValueAtTime(900, t + D); }
       src.connect(filtro).connect(suave).connect(g).connect(destino());
       src.start(t); src.stop(t + D + 0.1);
       aireActual = { src, g };
@@ -154,7 +155,7 @@
     const iconoSonido = () => conSonido ? '🔊' : '🔇';
     const botonSonido = () => `<button class="boton texto gris" data-g="sonido" aria-label="Sonido" style="font-size:20px;letter-spacing:0">${iconoSonido()}</button>`;
 
-    const cerrar = () => { clearInterval(timer); pararAire(); pararMar(); capa.remove(); try { wake && wake.release(); } catch {} };
+    const cerrar = () => { clearInterval(timer); cancelAnimationFrame(anim.raf); pararAire(); pararMar(); capa.remove(); try { wake && wake.release(); } catch {} };
 
     function pintar() {
       const x = fases[f];
@@ -199,6 +200,25 @@
       if (resp) respirar(true);
     }
 
+    // El círculo se mueve con JavaScript (cuadro por cuadro): así funciona en todos los celulares,
+    // incluso los que tienen activado "reducir movimiento", que apaga las animaciones de CSS.
+    const anim = { raf: 0, escala: 0.45 };
+    const suavizar = (p) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
+    function animar(bola, desde, hacia, segundos) {
+      cancelAnimationFrame(anim.raf);
+      const t0 = performance.now(), D = Math.max(0.05, segundos) * 1000;
+      bola.style.transition = 'none';
+      const paso = (ahora) => {
+        const p = Math.min(1, (ahora - t0) / D);
+        anim.escala = desde + (hacia - desde) * suavizar(p);
+        bola.style.transform = `scale(${anim.escala})`;
+        if (p < 1) anim.raf = requestAnimationFrame(paso);
+      };
+      bola.style.transform = `scale(${desde})`;
+      anim.escala = desde;
+      anim.raf = requestAnimationFrame(paso);
+    }
+
     // Calcula en qué parte de la respiración va (inhala, sostén, exhala) y mueve el círculo.
     function respirar(forzar) {
       const x = fases[f];
@@ -225,11 +245,9 @@
       if (etiqueta) etiqueta.textContent = p.t;
       capa.dataset.fase = hacia > desde ? 'crece' : hacia < desde ? 'baja' : 'quieta';
       if (bola) {
-        if (!bola.style.transform || (cambio && dentro === 0)) bola.style.transform = `scale(${desde})`;
-        bola.style.transition = 'none';
-        void bola.offsetWidth;
-        bola.style.transition = `transform ${queda}s cubic-bezier(.45,.05,.55,.95)`;
-        bola.style.transform = `scale(${hacia})`;
+        const inicio = (!bola.dataset.vivo || (cambio && dentro === 0)) ? desde : anim.escala;
+        bola.dataset.vivo = '1';
+        animar(bola, inicio, hacia, queda);
       }
       if (!pausa) {
         if (hacia > desde) aire('entra', queda);
@@ -253,7 +271,7 @@
       pararAire(); restante = fases[f].segundos; pitido(true); toque(30); pintar();
     }
     function terminar() {
-      clearInterval(timer); pararAire(); pararMar(); pitido(true);
+      clearInterval(timer); cancelAnimationFrame(anim.raf); pararAire(); pararMar(); pitido(true);
       capa.dataset.fase = '';
       capa.innerHTML = `<div class="centro" style="align-items:center;text-align:center">
         <div style="font-size:72px;animation:caer .6s var(--resorte) both" aria-hidden="true">🌱</div>
@@ -283,7 +301,7 @@
         const bola = capa.querySelector('[data-bola]');
         if (!bola) volumenMar(pausa ? 0 : VOL_MAR);
         if (bola) {
-          if (pausa) { pararAire(); volumenMar(0); const m = getComputedStyle(bola).transform; bola.style.transition = 'none'; bola.style.transform = m; }
+          if (pausa) { pararAire(); volumenMar(0); cancelAnimationFrame(anim.raf); }
           else { volumenMar(VOL_MAR); respirar(true); }
         }
       }
